@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -19,5 +18,11 @@ Route::get('/', function () {
 });
 
 Auth::routes();
-Route::get('admin/home', [HomeController::class, 'admin_Home'])->name('admin.home')->middleware('is_admin');
+
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::prefix('admin')->group(function() {
+    Route::get('/login',[\App\Http\Controllers\Auth\AdminLoginController::class,'showLoginForm'])->name('admin.login');
+    Route::post('/login', [\App\Http\Controllers\Auth\AdminLoginController::class,'login'])->name('admin.login.submit');
+    Route::get('logout/', [\App\Http\Controllers\Auth\AdminLoginController::class,'logout'])->name('admin.logout');
+    Route::get('/', [\App\Http\Controllers\Auth\AdminController::class,'index'])->name('admin.dashboard');
+}) ;
