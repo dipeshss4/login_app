@@ -12,33 +12,21 @@ class RedirectIfAuthenticated
     /**
      * Handle an incoming request.
      *
-     * @param Request $request
-     * @param  \Closure  $next
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @param  string|null  ...$guards
-     * @return mixed
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, $guard = null)
+    public function handle(Request $request, Closure $next, ...$guards)
     {
+        $guards = empty($guards) ? [null] : $guards;
 
-        switch ($guard) {
-            case 'admin':
-                if (Auth::guard($guard)->check()) {
-                    return redirect()->route('admin.dashboard');
-                }
-                break;
-            case 'auth:api':
-                if (Auth::guard($guard)->check()){
-                  return  response()->json("success",200);
-                }
-                break;
-
-            default:
-                if (Auth::guard($guard)->check()) {
-                    return redirect('/');
-                }
-                break;
+        foreach ($guards as $guard) {
+            if (Auth::guard($guard)->check()) {
+                return redirect(RouteServiceProvider::HOME);
+            }
         }
-        return $next($request);
 
+        return $next($request);
     }
 }
